@@ -46,6 +46,7 @@ const initState: State = {
     stock: 0,
     unit: "",
     expiry_date: "",
+    amount: 0,
   },
 };
 

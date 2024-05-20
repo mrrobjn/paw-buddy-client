@@ -103,6 +103,7 @@ type Medicine = {
   stock: number;
   unit: string;
   expiry_date: string;
+  amount: number;
 };
 
 interface PetService {
