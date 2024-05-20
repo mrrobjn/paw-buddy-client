@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { loginUser, logoutUser } from "./async";
 
 const initialState: User = {
-  id: "",
+  id: 0,
   email: "",
   password: "",
   fullName: "Your Name",
