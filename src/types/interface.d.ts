@@ -196,10 +196,19 @@ interface Message {
   updatedAt: string;
 }
 
+interface Notify {
+  _id: string;
+  receiverId: string;
+  content: string;
+  is_read: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface SocketState {
   onlineUsers: string[];
   messages: Message[];
-  unread: number;
+  notifications: Notify[];
 }
 
 interface Vaccine {

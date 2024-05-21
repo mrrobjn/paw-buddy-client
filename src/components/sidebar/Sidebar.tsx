@@ -20,6 +20,7 @@ import { useState } from "react";
 import { FaChevronLeft } from "react-icons/fa";
 import { Button } from "../common/Button";
 import { NoAvatar } from "../common/NoAvatar";
+import Notifications from "./Notifications";
 
 const paths = [
   {
@@ -36,7 +37,7 @@ const paths = [
     url: "/account",
     label: "My Account",
     icon: <FaUser size={14} />,
-  }
+  },
 ];
 
 const adminPaths = [
@@ -97,6 +98,7 @@ export const Sidebar = () => {
           />
         </div>
         <div className="flex flex-col mt-4 items-center">
+          <Notifications />
           {paths.map((path, i) => (
             <Link
               style={{

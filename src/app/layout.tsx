@@ -8,6 +8,7 @@ import "@/styles/pagination_custom_style.css";
 import "@/styles/animation.css";
 import "rodal/lib/rodal.css";
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import 'react-toastify/dist/ReactToastify.css';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,7 +28,17 @@ export default function RootLayout({
         <body className={inter.className}>
           <PageWrapper>
             {children}
-            <ToastContainer />
+            <ToastContainer
+              position="top-right"
+              autoClose={5000}
+              hideProgressBar={true}
+              newestOnTop={true}
+              closeOnClick
+              rtl={false}
+              draggable
+              pauseOnHover={false}
+              theme="light"
+            />
           </PageWrapper>
         </body>
       </html>

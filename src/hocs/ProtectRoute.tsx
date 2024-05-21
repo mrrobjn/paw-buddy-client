@@ -10,9 +10,14 @@ import { getAccessToken, getRefreshToken } from "@/config/axios";
 import { userSelector } from "@/redux/selector";
 import { logoutUser } from "@/redux/user/async";
 import { Socket, io } from "socket.io-client";
-import { setMessages, setOnlineUsers } from "@/redux/socket/socketSlice";
+import {
+  setMessages,
+  setNotifies,
+  setOnlineUsers,
+} from "@/redux/socket/socketSlice";
 // @ts-ignore
 import notificationSound from "../assets/sounds/frontend_src_assets_sounds_notification.mp3";
+import { toast } from "react-toastify";
 
 const ProtectRoute: React.FC<LayoutProp> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -87,7 +92,15 @@ const ProtectRoute: React.FC<LayoutProp> = ({ children }) => {
       sound.play();
       dispatch(setMessages(newMessage));
     };
+    const handleNewNotification = (newNotify: Notify | any) => {
+      newNotify.shouldShake = true;
+      const sound = new Audio(notificationSound);
+      sound.play();
+      dispatch(setNotifies(newNotify));
+      toast.info(newNotify.content);
+    };
     socket?.on("newMessage", handleNewMessage);
+    socket?.on("newNotification", handleNewNotification);
     return () => {
       socket?.off("newMessage", handleNewMessage);
     };

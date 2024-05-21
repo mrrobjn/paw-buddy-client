@@ -118,6 +118,8 @@ const BookingDetailModal: React.FC<Props> = ({
           changeStatus(value);
           await fetchBooking();
           handleChange("error", initState.error);
+        } else {
+          handleChange("error", resData.mess);
         }
       } else if (value === "cancelled") {
         const resData = await apiCancelBooking(booking.id);
@@ -125,6 +127,8 @@ const BookingDetailModal: React.FC<Props> = ({
           changeStatus(value);
           await fetchBooking();
           handleChange("error", initState.error);
+        } else {
+          handleChange("error", resData.mess);
         }
       }
     } catch (error) {
@@ -143,7 +147,7 @@ const BookingDetailModal: React.FC<Props> = ({
         title="booking detail"
         visible={visible}
         onClose={handleClose}
-        footer={booking.status !== "finished" && booking.status !== "cancelled"}
+        footer={booking.status === "confirmed"}
         error={state.error}
         onSubmit={handleOpenConfirm}
       >

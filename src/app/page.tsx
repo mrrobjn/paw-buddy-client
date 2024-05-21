@@ -60,7 +60,9 @@ export default function Home() {
     vet_id?: number;
   }) => {
     try {
-      if (user.roleId !== 1) querys.vet_id === user.id;
+      if (user.roleId !== 1) {
+        querys.vet_id = user.id;
+      }
       const resData = await apiGetBooking(querys);
       if (resData.success) {
         const appoinments: Booking[] = resData.data;

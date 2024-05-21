@@ -1,12 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { Socket } from "socket.io-client";
 
-interface State extends SocketState {}
-
-const initialState: State = {
+const initialState: SocketState = {
   onlineUsers: [],
   messages: [],
-  unread: 0,
+  notifications: [],
 };
 
 export const socketReducer = createSlice({
@@ -24,8 +21,16 @@ export const socketReducer = createSlice({
         (m) => m.receiverId !== action.payload.id
       );
     },
+    setNotifies: (state, action) => {
+      state.notifications = [...state.notifications, action.payload];
+    },
+    removeReadNotify: (state, action) => {
+      state.notifications = state.notifications.filter(
+        (m) => m.receiverId !== action.payload.id
+      );
+    },
   },
 });
 
-export const { setOnlineUsers, setMessages, removeSyncedMessage } =
+export const { setNotifies, setOnlineUsers, setMessages, removeSyncedMessage } =
   socketReducer.actions;
