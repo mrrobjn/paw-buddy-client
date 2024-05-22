@@ -15,7 +15,7 @@ interface ModalInputProp {
   id?: string;
   register?: UseFormRegisterReturn;
   value?: any;
-  onchange?: ChangeEventHandler;
+  onchange?: ChangeEventHandler | any;
 }
 
 export const ModalInput: React.FC<ModalInputProp> = ({
@@ -32,7 +32,7 @@ export const ModalInput: React.FC<ModalInputProp> = ({
   return (
     <input
       id={id}
-      type={type||"text"}
+      type={type || "text"}
       placeholder={placeholder}
       className={`w-full p-2 focus:border-b-primary transition-all border-b-2 outline-none bg-lg-blue ${
         type === "file" && "p-0"

@@ -10,7 +10,7 @@ export const NoAvatar: React.FC<Props> = ({ name, style }) => {
   return (
     <div
       style={style}
-      className="rounded-full w-full uppercase h-full bg-green-100 text-success border-[1px] font-bold flex justify-center items-center"
+      className="rounded-full w-full uppercase h-full bg-green-100 text-success font-bold flex justify-center items-center"
     >
       {name ? getFirstCharacters(name) : "N"}
     </div>

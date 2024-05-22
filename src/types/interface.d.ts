@@ -41,7 +41,10 @@ interface Booking {
   pet_id: number;
   vet_id: number;
   date: string;
-  status: "pending" | "confirmed" | "finished" | "cancelled";
+  dataRecord: {
+    id: number;
+  } | null;
+  status: "pending" | "confirmed" | "cancelled" | "completed";
   start_time: string;
   end_time: string;
   note: string | null;
@@ -52,6 +55,7 @@ interface Booking {
     fullName: string;
     email: string;
     phone: string | null;
+    avatar: string | null;
   };
   services: {
     id: number;
@@ -227,4 +231,60 @@ interface Vaccine {
   note: string | null;
   createdAt?: string;
   updatedAt?: string;
+}
+
+interface RecordField {
+  diagnosis: string;
+  symptoms: string;
+  treatment_plan: string;
+  medicine_ids: string;
+  vaccine_id: string;
+}
+
+interface PetRecord {
+  id: number;
+  pet_id: number;
+  vet_id: number;
+  booking_id: number;
+  exam_date: string;
+  diagnosis: string;
+  symptoms: string;
+  treatment_plan: string;
+  next_appointment_date: string;
+  vaccine_id: number;
+  createdAt: string;
+  updatedAt: string;
+  bookingData: Booking;
+  medicationsData: {
+    dosage: null;
+    medical_record_id: 3;
+    medication_id: 3;
+    id: 8;
+    medicineData: Medicine;
+  }[];
+  vaccineData: Vaccine;
+}
+
+interface Pet {
+  id: number;
+  user_id: number;
+  name_pet: string;
+  species: number;
+  breed: string;
+  gender: false;
+  date_of_birth: string;
+  adoption: string;
+  size: string;
+  weight: number;
+  photo: string;
+  is_neutered: false;
+  createdAt: string;
+  updatedAt: string;
+  speciesData: null;
+  userData: {
+    id: number;
+    fullName: string;
+    email: string;
+    phone: string | null;
+  };
 }

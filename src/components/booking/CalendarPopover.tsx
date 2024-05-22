@@ -61,7 +61,7 @@ const CalendarPopover: React.FC<Props> = ({
           <span className="font-semibold mr-2">Status:</span>
           <p
             className={`border-2 px-2 rounded-full font-semibold ${
-              booking.status === "finished"
+              booking.status === "completed"
                 ? "text-success bg-green-50 border-success"
                 : booking.status === "cancelled"
                 ? "text-danger bg-red-50 border-danger"

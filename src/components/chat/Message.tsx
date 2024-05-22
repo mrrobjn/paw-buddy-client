@@ -1,5 +1,4 @@
 "use client";
-import { ASSET_PATH } from "@/constants";
 import { useAppSelector } from "@/redux/hook";
 import { userSelector } from "@/redux/selector";
 import moment from "moment";
