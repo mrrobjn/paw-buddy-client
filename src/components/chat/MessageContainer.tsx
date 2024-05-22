@@ -1,22 +1,13 @@
 "use client";
-import { ASSET_PATH } from "@/constants";
 import { ChatInput } from "./ChatInput";
 import { Message } from "./Message";
 import { useEffect, useState } from "react";
 import { apiGetMessages } from "@/apis";
-import {
-  FaCamera,
-  FaHand,
-  FaInfo,
-  FaPhone,
-  FaRegMessage,
-  FaVideo,
-} from "react-icons/fa6";
-import { useAppDispatch, useAppSelector } from "@/redux/hook";
+import { FaHand, FaPhone, FaVideo } from "react-icons/fa6";
+import { useAppSelector } from "@/redux/hook";
 import { socketSelector, userSelector } from "@/redux/selector";
 import { NoAvatar } from "../common/NoAvatar";
 import { FaInfoCircle } from "react-icons/fa";
-import moment from "moment";
 
 interface Props {
   currentChat: Conversation;
@@ -116,7 +107,9 @@ export const MessageContainer: React.FC<Props> = ({ currentChat }) => {
         <div className="flex flex-col items-center">
           <div className="flex items-center">
             <FaHand size={40} color="orange" className="hand-shake" />
-            <p className="text-xl ml-2">Hi there, <span className="font-bold">{user.fullName}</span></p>
+            <p className="text-xl ml-2">
+              Hi there, <span className="font-bold">{user.fullName}</span>
+            </p>
           </div>
           <p className="text-xl mt-3">
             Select a conversation to start messaging

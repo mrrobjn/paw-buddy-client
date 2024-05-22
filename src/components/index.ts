@@ -13,6 +13,7 @@ import { ChatSidebar } from "./chat/ChatSidebar";
 import { MessageContainer } from "./chat/MessageContainer";
 import { ErrorMessage } from "./form/ErrorMessage";
 import { NoAvatar } from "./common/NoAvatar";
+import { VetRecords } from "./account/VetRecords";
 
 export {
   Sidebar,
@@ -30,4 +31,5 @@ export {
   MessageContainer,
   ErrorMessage,
   NoAvatar,
+  VetRecords,
 };

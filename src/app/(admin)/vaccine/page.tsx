@@ -1,5 +1,5 @@
 "use client";
-import { apiDeleteVaccin, apiGetAllVaccins } from "@/apis/vaccin";
+import { apiDeleteVaccine, apiGetAllVaccines } from "@/apis/vaccine";
 import {
   ActionBar,
   Button,
@@ -10,8 +10,8 @@ import {
 import HeadTitle from "@/components/common/HeadTitle";
 import ModalAction from "@/components/form/ModalAction";
 import TableFooter from "@/components/table/TableFooter";
-import CreateVaccinForm from "@/components/vaccin/CreateVaccinForm";
-import EditVaccinForm from "@/components/vaccin/EditVaccinForm";
+import CreateVaccinForm from "@/components/vaccine/CreateVaccineForm";
+import EditVaccinForm from "@/components/vaccine/EditVaccineForm";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { FaPencil, FaPlus, FaTrash } from "react-icons/fa6";
@@ -23,7 +23,7 @@ type State = {
   editVisible: boolean;
   delVisible: boolean;
   page: number;
-  vaccin: Vaccine;
+  vaccine: Vaccine;
   vaccins: Vaccine[];
   count: number;
 };
@@ -35,7 +35,7 @@ const initState: State = {
   page: 1,
   vaccins: [],
   count: 0,
-  vaccin: {
+  vaccine: {
     id: 0,
     service_id: 0,
     name_vaccine: "",
@@ -68,7 +68,7 @@ const Vaccin = () => {
 
   const getVaccins = async () => {
     try {
-      const resData = await apiGetAllVaccins({
+      const resData = await apiGetAllVaccines({
         limit: 10,
         page: state.page,
       });
@@ -97,7 +97,7 @@ const Vaccin = () => {
 
   const deleteVaccine = async () => {
     try {
-      const resData = await apiDeleteVaccin(state.vaccin.id);
+      const resData = await apiDeleteVaccine(state.vaccine.id);
       if (resData.success) {
         getVaccins();
       }
@@ -113,7 +113,7 @@ const Vaccin = () => {
         visible={state.editVisible}
         onClose={() => handleChange("editVisible", false)}
         handleSuccess={getVaccins}
-        vaccin={state.vaccin}
+        vaccine={state.vaccine}
       />
       <CreateVaccinForm
         visible={state.createVisible}
@@ -125,9 +125,9 @@ const Vaccin = () => {
         onClose={() => handleChange("delVisible", false)}
         onSubmit={deleteVaccine}
         type="delete"
-        message={`Do you want to delete ${state.vaccin.name_vaccine} category`}
+        message={`Do you want to delete ${state.vaccine.name_vaccine} category`}
       />
-      <HeadTitle>Vaccin Management</HeadTitle>
+      <HeadTitle>Vaccine Management</HeadTitle>
       <ActionBar>
         <Button
           btnType="primary"

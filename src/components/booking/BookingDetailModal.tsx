@@ -3,13 +3,24 @@ import moment from "moment";
 import ModalForm from "../form/ModalForm";
 import { ModalSelect } from "../form/ModalSelect";
 import { RowField } from "../form/RowField";
-import { FaMars, FaMinus, FaPlus, FaVenus } from "react-icons/fa6";
+import { FaMars, FaMinus, FaPlus, FaVenus, FaXmark } from "react-icons/fa6";
 import { Button } from "../common/Button";
 import { useEffect, useState } from "react";
 import MedicineChooseModal from "./MedicineChooseModal";
-import { apiApproveBooking, apiCancelBooking } from "@/apis";
+import {
+  apiApproveBooking,
+  apiCancelBooking,
+  apiGetAllVaccines,
+  apiUpdateRecord,
+} from "@/apis";
 import ModalAction from "../form/ModalAction";
 import PetRecordModal from "./PetRecordModal";
+import { ModalTextarea } from "../form/ModalTextarea";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+import { useAppSelector } from "@/redux/hook";
+import { userSelector } from "@/redux/selector";
+import { NoAvatar } from "../common/NoAvatar";
 
 interface Props {
   visible: boolean;
@@ -20,6 +31,7 @@ interface Props {
 }
 
 interface State {
+  vaccine_id: number;
   medVisible: boolean;
   confirmVisible: boolean;
   warningVisible: boolean;
@@ -27,6 +39,9 @@ interface State {
   curMeds: Medicine[];
   totalPrice: number;
   error: string;
+  isLoading: boolean;
+  vaccines: Vaccine[];
+  record_id: number;
 }
 
 const initState: State = {
@@ -37,6 +52,10 @@ const initState: State = {
   confirmVisible: false,
   warningVisible: false,
   recVisible: false,
+  isLoading: false,
+  vaccines: [],
+  vaccine_id: 0,
+  record_id: 0,
 };
 
 const BookingDetailModal: React.FC<Props> = ({
@@ -46,22 +65,38 @@ const BookingDetailModal: React.FC<Props> = ({
   changeStatus,
   fetchBooking,
 }) => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<RecordField>();
   const [state, setState] = useState<State>(initState);
+  const user: User = useAppSelector(userSelector);
 
   useEffect(() => {
-    let totalPrice = state.totalPrice;
-    totalPrice = booking.services.reduce(
-      (sum, item) => sum + parseInt(item.price),
-      0
-    );
-    totalPrice +=
-      state.curMeds &&
-      state.curMeds.reduce(
-        (sum, item) => sum + parseInt(item.price) * item.amount,
+    if (visible) {
+      let totalPrice = state.totalPrice;
+      totalPrice = booking.services.reduce(
+        (sum, item) => sum + parseInt(item.price),
         0
       );
-    handleChange("totalPrice", totalPrice);
-  }, [state.curMeds, visible]);
+      totalPrice +=
+        state.curMeds &&
+        state.curMeds.reduce((sum, item) => sum + parseInt(item.price), 0);
+      totalPrice +=
+        state.vaccine_id &&
+        parseFloat(
+          state.vaccines.find((v) => v.id == state.vaccine_id)?.price || ""
+        );
+
+      handleChange("totalPrice", totalPrice);
+    }
+  }, [state.curMeds, visible, state.vaccine_id]);
+
+  useEffect(() => {
+    if (visible) fetchVaccine();
+  }, [visible]);
 
   const handleChange = (name: string, value: any) => {
     setState((prevState) => ({
@@ -70,40 +105,35 @@ const BookingDetailModal: React.FC<Props> = ({
     }));
   };
 
+  const fetchVaccine = async () => {
+    try {
+      let hasVaccine = booking.services.find(
+        (s) => s.name_service.split(" ")[0] === "Vaccine"
+      );
+      if (hasVaccine) {
+        const resData = await apiGetAllVaccines({
+          service_id: hasVaccine.id,
+        });
+        if (resData.success) {
+          handleChange("vaccines", resData.data);
+          handleChange("vaccine_id", resData.data[0].id);
+        }
+      }
+    } catch (error) {}
+  };
+
   const handleClose = () => {
     onClose();
     setState(initState);
-  };
-
-  const increaseAmount = (i: number) => {
-    const updatedMeds = [...state.curMeds];
-    const clonedMed = { ...updatedMeds[i] };
-    if (clonedMed.stock !== clonedMed.amount) {
-      clonedMed.amount += 1;
-      updatedMeds[i] = clonedMed;
-      handleChange("curMeds", updatedMeds);
-    }
-  };
-
-  const descreaseAmount = (i: number) => {
-    const updatedMeds = [...state.curMeds];
-    const clonedMed = { ...updatedMeds[i] };
-    if (clonedMed.amount === 1) {
-      updatedMeds.splice(i);
-      handleChange("curMeds", updatedMeds);
-    } else {
-      clonedMed.amount -= 1;
-      updatedMeds[i] = clonedMed;
-      handleChange("curMeds", updatedMeds);
-    }
+    reset();
   };
 
   const appendMedicine = (medicine: Medicine) => {
-    const existed = state.curMeds.findIndex((m) => m.id === medicine.id);
-    if (existed !== -1) {
-      increaseAmount(existed);
-    } else {
+    const existed = state.curMeds.find((m) => m.id === medicine.id);
+    if (!existed) {
       handleChange("curMeds", [...state.curMeds, medicine]);
+    } else {
+      toast.warning(`Already add ${medicine.name_medicine}`);
     }
   };
 
@@ -116,7 +146,11 @@ const BookingDetailModal: React.FC<Props> = ({
         });
         if (resData.success) {
           changeStatus(value);
-          await fetchBooking();
+          const data: Booking[] = await fetchBooking();
+          handleChange(
+            "record_id",
+            data.find((b) => b.id === booking.id)?.dataRecord?.id
+          );
           handleChange("error", initState.error);
         } else {
           handleChange("error", resData.mess);
@@ -126,6 +160,7 @@ const BookingDetailModal: React.FC<Props> = ({
         if (resData.success) {
           changeStatus(value);
           await fetchBooking();
+          handleChange("curMeds", initState.curMeds);
           handleChange("error", initState.error);
         } else {
           handleChange("error", resData.mess);
@@ -139,6 +174,37 @@ const BookingDetailModal: React.FC<Props> = ({
   const handleOpenConfirm = (e: any) => {
     e.preventDefault();
     handleChange("confirmVisible", true);
+  };
+
+  const onSubmit: SubmitHandler<RecordField> = async (data) => {
+    try {
+      handleChange("isLoading", true);
+      let result = "";
+      state.curMeds.forEach((res, i) => {
+        if (i + 1 < state.curMeds.length) {
+          result += res.id + ",";
+        } else {
+          result += res.id;
+        }
+      });
+      data.medicine_ids = result;
+      const resData = await apiUpdateRecord(
+        booking.dataRecord?.id || state.record_id,
+        data
+      );
+      if (resData.success) {
+        changeStatus("completed");
+        await fetchBooking();
+        toast.success("Booking completed");
+        handleChange("error", initState.error);
+        handleChange("confirmVisible", initState.confirmVisible);
+      } else {
+        handleChange("error", resData.message);
+      }
+    } catch (error: any) {
+      handleChange("error", "Error: Something wrong");
+    }
+    handleChange("isLoading", false);
   };
 
   return (
@@ -162,17 +228,19 @@ const BookingDetailModal: React.FC<Props> = ({
                       value={booking.status}
                       onChange={(e) => handleStatusChange(e.target.value)}
                       disabled={
-                        booking.status === "finished" ||
-                        booking.status === "cancelled"
+                        booking.status === "cancelled" ||
+                        booking.status === "completed"
                       }
                       className="font-bold"
                     >
                       {booking.status === "pending" && (
                         <option value="pending">Pending</option>
                       )}
-                      <option value="confirmed">Confirmed</option>
-                      {booking.status === "finished" && (
-                        <option value="finished">Finished</option>
+                      {user.roleId === 2 && (
+                        <option value="confirmed">Confirmed</option>
+                      )}
+                      {booking.status === "completed" && (
+                        <option value="completed">Completed</option>
                       )}
                       <option value="cancelled">Cancelled</option>
                     </ModalSelect>
@@ -225,18 +293,43 @@ const BookingDetailModal: React.FC<Props> = ({
                     </div>
                   }
                 />
-                <RowField label={"Owner"} value={booking.dataUser.fullName} />
+                <RowField
+                  label={"Owner"}
+                  value={
+                    <div className="flex">
+                      <div className="h-6 w-6 mr-2">
+                        {booking.dataUser.avatar ? (
+                          <img
+                            className="h-full w-full object-cover rounded-full"
+                            src={booking.dataUser.avatar}
+                            alt="pet_avt"
+                          />
+                        ) : (
+                          <NoAvatar
+                            style={{ fontSize: 8 }}
+                            name={booking.dataUser.fullName}
+                          />
+                        )}
+                      </div>
+                      <span>{booking.dataUser.fullName}</span>
+                    </div>
+                  }
+                />
                 <RowField
                   label={"Gender"}
                   value={
                     booking.dataPet.gender ? (
                       <div className="flex items-center">
-                        <FaMars style={{ marginRight: 8 }} color="#247CFF" />
+                        <div className="h-6 w-6 mr-2 flex justify-center items-center">
+                          <FaMars color="#247CFF" />
+                        </div>
                         Male
                       </div>
                     ) : (
                       <div className="flex items-center">
-                        <FaVenus style={{ marginRight: 8 }} color="#FC5A5A" />
+                        <div className="h-6 w-6 mr-2 flex justify-center items-center">
+                          <FaVenus color="#FC5A5A" />
+                        </div>
                         Female
                       </div>
                     )
@@ -252,9 +345,7 @@ const BookingDetailModal: React.FC<Props> = ({
                 />
                 <RowField
                   label={"Weight & size"}
-                  value={
-                    booking.dataPet.size + " " + booking.dataPet.weight + "kg"
-                  }
+                  value={`${booking.dataPet.size} / ${booking.dataPet.weight} kg`}
                 />
                 <RowField
                   label={"Neutered"}
@@ -269,83 +360,142 @@ const BookingDetailModal: React.FC<Props> = ({
                 />
               </div>
             </div>
-            <div>
-              <h1 className="font-semibold">Services</h1>
-              {booking.services.map((service, i) => {
+            {booking.status === "confirmed" && (
+              <>
+                <RowField
+                  label={"diagnosis"}
+                  value={
+                    <ModalTextarea
+                      disabled={booking.status !== "confirmed"}
+                      placeholder="diagnosis"
+                      register={register("diagnosis")}
+                    />
+                  }
+                />
+                <RowField
+                  label={"symptoms"}
+                  value={
+                    <ModalTextarea
+                      disabled={booking.status !== "confirmed"}
+                      placeholder="symptoms"
+                      register={register("symptoms")}
+                    />
+                  }
+                />
+                <RowField
+                  label={"treatment plan"}
+                  value={
+                    <ModalTextarea
+                      disabled={booking.status !== "confirmed"}
+                      placeholder="treatment plan"
+                      register={register("treatment_plan")}
+                    />
+                  }
+                />
+              </>
+            )}
+            <RowField
+              label={"Services"}
+              value={booking.services.map((service, i) => {
                 return (
                   <div
                     key={i}
-                    className="flex justify-between bg-lg-blue p-2 mt-2 rounded-lg"
+                    className="flex justify-between bg-lg-blue p-2 mb-2"
                   >
                     <p>
-                      {service.name_service +
-                        " (" +
-                        service.estimated_duration +
-                        " min)"}
+                      {`${service.name_service} (${service.estimated_duration} min)`}
                     </p>
                     <p>{service.price}</p>
                   </div>
                 );
               })}
-            </div>
-            <div className={`mt-2`}>
-              {(booking.status === "confirmed" ||
-                booking.status === "finished") && (
-                <h1 className="font-semibold">Prescribe medicine</h1>
-              )}
-
-              <div className="mt-2">
-                {booking.status &&
-                  state.curMeds.map((med, i) => {
-                    return (
-                      <div
-                        key={i}
-                        className="flex justify-between items-center bg-lg-blue p-2 mb-2 rounded-lg"
-                      >
-                        <div>
-                          <p className="mb-2">{med.name_medicine}</p>
-                          <div className="flex">
-                            <button
-                              className="px-2"
-                              type="button"
-                              onClick={() => descreaseAmount(i)}
-                            >
-                              <FaMinus size={12} />
-                            </button>
-                            <p className="mx-2 bg-secondary px-2 rounded transition-all">
-                              {med.amount}
-                            </p>
-                            <button
-                              className="px-2"
-                              type="button"
-                              onClick={() => increaseAmount(i)}
-                            >
-                              <FaPlus size={12} />
-                            </button>
-                          </div>
-                        </div>
-                        <p>{parseInt(med.price) * med.amount}</p>
-                      </div>
-                    );
-                  })}
-                {booking.status === "confirmed" && (
-                  <Button
-                    type="button"
-                    style={{ width: "100%" }}
-                    btnType="primary"
-                    onClick={() => handleChange("medVisible", true)}
-                  >
-                    <div className="flex justify-center">
-                      <FaPlus />
+            />
+            {state.vaccines.length > 0 && booking.status === "confirmed" && (
+              <RowField
+                label={"Vaccine"}
+                value={
+                  <div className="flex">
+                    <ModalSelect
+                      disabled={booking.status !== "confirmed"}
+                      value={state.vaccine_id.toString()}
+                      register={register("vaccine_id", {
+                        required: true,
+                        onChange(event) {
+                          handleChange("vaccine_id", event.target.value);
+                        },
+                      })}
+                    >
+                      {state.vaccines.map((vac, i) => {
+                        return (
+                          <option key={i} value={vac.id}>
+                            {`${vac.type_disease} - ${vac.name_vaccine}`}
+                          </option>
+                        );
+                      })}
+                    </ModalSelect>
+                    <div className="p-2 h-full bg-lg-blue w-[100px] text-right">
+                      {state.vaccines.find((v) => v.id == state.vaccine_id)
+                        ?.price || state.vaccines[0]?.price}
                     </div>
-                  </Button>
-                )}
-              </div>
-            </div>
-            <div className="flex justify-between pr-2 py-2 mt-2 font-bold">
-              <p>TOTAL BILL</p>
-              <p>{state.totalPrice.toLocaleString()}</p>
-            </div>
+                  </div>
+                }
+              />
+            )}
+            {booking.status === "confirmed" && (
+              <RowField
+                label={"Medicines"}
+                value={
+                  <div>
+                    {state.curMeds.map((med, i) => {
+                      return (
+                        <div
+                          key={i}
+                          className="flex justify-between items-center bg-lg-blue p-2 mb-2"
+                        >
+                          <div className="flex items-center">
+                            <Button
+                              type="button"
+                              btnType="danger"
+                              style={{ marginRight: 8, padding: 2 }}
+                              onClick={() =>
+                                handleChange(
+                                  "curMeds",
+                                  state.curMeds.filter((m) => m.id !== med.id)
+                                )
+                              }
+                            >
+                              <FaXmark />
+                            </Button>
+                            <p>{med.name_medicine}</p>
+                          </div>
+                          <p>{med.price}</p>
+                        </div>
+                      );
+                    })}
+                    <Button
+                      type="button"
+                      style={{ width: "100%" }}
+                      btnType="primary"
+                      onClick={() => handleChange("medVisible", true)}
+                    >
+                      <div className="flex justify-center">
+                        <FaPlus />
+                      </div>
+                    </Button>
+                  </div>
+                }
+              />
+            )}
+            {booking.status === "confirmed" && (
+              <RowField
+                label={"TOTAL BILL"}
+                value={
+                  <p className="text-right font-bold p-2">
+                    {state.totalPrice.toLocaleString()}
+                  </p>
+                }
+              />
+            )}
           </div>
         )}
       </ModalForm>
@@ -357,7 +507,7 @@ const BookingDetailModal: React.FC<Props> = ({
       <ModalAction
         onClose={() => handleChange("confirmVisible", false)}
         visible={state.confirmVisible}
-        onSubmit={() => console.log(1)}
+        onSubmit={handleSubmit(onSubmit)}
         message="Do you want to finish this booking?"
         type="confirm"
       />

@@ -1,8 +1,9 @@
 import api from "@/config/axios";
 
-export const apiGetAllVaccins = async (params: {
-  limit: number;
-  page: number;
+export const apiGetAllVaccines = async (params: {
+  limit?: number;
+  page?: number;
+  service_id?:number
 }) => {
   try {
     const res = await api.get("/vaccine/get-all-vaccine", { params });
@@ -12,7 +13,7 @@ export const apiGetAllVaccins = async (params: {
   }
 };
 
-export const apiCreateVaccin = async (data: Vaccine) => {
+export const apiCreateVaccine = async (data: Vaccine) => {
   try {
     const res = await api.post("/vaccine/admin/create-vaccine", data);
     return res.data;
@@ -21,7 +22,7 @@ export const apiCreateVaccin = async (data: Vaccine) => {
   }
 };
 
-export const apiUpdateVaccin = async (id: number, data: Vaccine) => {
+export const apiUpdateVaccine = async (id: number, data: Vaccine) => {
   try {
     const res = await api.put(`/vaccine/admin/update-vaccine/${id}`, data);
     return res.data;
@@ -30,7 +31,7 @@ export const apiUpdateVaccin = async (id: number, data: Vaccine) => {
   }
 };
 
-export const apiDeleteVaccin = async (id: number) => {
+export const apiDeleteVaccine = async (id: number) => {
   try {
     const res = await api.delete(`/vaccine/admin/delete-vaccine/${id}`);
     return res.data;

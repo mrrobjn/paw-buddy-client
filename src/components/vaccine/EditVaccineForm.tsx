@@ -1,48 +1,48 @@
-import { apiCreateVaccin } from "@/apis/vaccin";
 import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { ModalTextarea } from "../form/ModalTextarea";
-import { RowField } from "../form/RowField";
 import ModalForm from "../form/ModalForm";
 import { Loading } from "../loading/Loading";
+import { RowField } from "../form/RowField";
 import { ModalInput } from "../form/ModalInput";
+import { ModalTextarea } from "../form/ModalTextarea";
+import { apiGetAllService, apiUpdateVaccine } from "@/apis";
 import { ModalSelect } from "../form/ModalSelect";
-import { apiGetAllService } from "@/apis";
 
 interface Props {
   visible: boolean;
   onClose: Function;
   handleSuccess?: Function;
+  vaccine: Vaccine;
 }
 
 interface State {
+  services: PetService[];
   isLoading: boolean;
   error: string;
-  services: PetService[];
 }
 
-const CreateVaccinForm: React.FC<Props> = ({
+const EditVaccineForm: React.FC<Props> = ({
   visible,
   onClose,
+  vaccine,
   handleSuccess,
 }) => {
+  const [state, setState] = useState<State>({
+    isLoading: false,
+    error: "",
+    services: [],
+  });
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
   } = useForm<Vaccine>();
-  const [state, setState] = useState<State>({
-    isLoading: false,
-    error: "",
-    services: [],
-  });
 
   useEffect(() => {
-    if (visible) {
-      getServices();
-    }
-  }, [visible]);
+    reset({ ...vaccine, expiry_date: vaccine.expiry_date.split("T")[0] });
+    getServices();
+  }, [vaccine]);
 
   const getServices = async () => {
     try {
@@ -63,22 +63,22 @@ const CreateVaccinForm: React.FC<Props> = ({
   const handleClose = () => {
     onClose();
     handleChange("error", "");
-    reset();
   };
 
   const onSubmit: SubmitHandler<Vaccine> = async (data) => {
     try {
       handleChange("isLoading", true);
-      const resData = await apiCreateVaccin(data);
+      const resData = await apiUpdateVaccine(vaccine.id, data);
       if (resData.success) {
         handleSuccess && (await handleSuccess());
-        handleClose();
         handleChange("error", "");
+        handleClose();
       } else {
         handleChange("error", "Error: Something wrong");
       }
     } catch (error: any) {
       handleChange("error", "Error: Something wrong");
+      console.error(error);
     }
     handleChange("isLoading", false);
   };
@@ -88,7 +88,7 @@ const CreateVaccinForm: React.FC<Props> = ({
       visible={visible}
       onClose={onClose}
       footer={!state.isLoading}
-      title="create vaccin"
+      title={`vaccin / ${vaccine.name_vaccine}`}
       error={state.error}
       onSubmit={handleSubmit(onSubmit)}
     >
@@ -106,6 +106,7 @@ const CreateVaccinForm: React.FC<Props> = ({
                 value={
                   <ModalInput
                     placeholder="vaccin name"
+                    defaultValue={vaccine.name_vaccine}
                     register={register("name_vaccine", { required: true })}
                   />
                 }
@@ -117,6 +118,7 @@ const CreateVaccinForm: React.FC<Props> = ({
                   <ModalInput
                     type="date"
                     placeholder="expire date"
+                    defaultValue={vaccine.expiry_date.split("T")[0]}
                     register={register("expiry_date", { required: true })}
                   />
                 }
@@ -128,6 +130,7 @@ const CreateVaccinForm: React.FC<Props> = ({
                   <ModalInput
                     type="number"
                     placeholder="doses"
+                    defaultValue={vaccine.number_of_doses}
                     register={register("number_of_doses", { required: true })}
                   />
                 }
@@ -141,6 +144,7 @@ const CreateVaccinForm: React.FC<Props> = ({
                   <ModalInput
                     type="number"
                     placeholder="price"
+                    defaultValue={vaccine.price}
                     register={register("price", { required: true })}
                   />
                 }
@@ -152,6 +156,7 @@ const CreateVaccinForm: React.FC<Props> = ({
                   <ModalInput
                     type="number"
                     placeholder="stock"
+                    defaultValue={vaccine.stock}
                     register={register("stock", { required: true })}
                   />
                 }
@@ -161,6 +166,7 @@ const CreateVaccinForm: React.FC<Props> = ({
                 label="service"
                 value={
                   <ModalSelect
+                    defaultValue={vaccine.service_id}
                     register={register("service_id", { required: true })}
                   >
                     {state.services.map((s, i) => (
@@ -178,6 +184,7 @@ const CreateVaccinForm: React.FC<Props> = ({
               value={
                 <ModalInput
                   placeholder="type disease"
+                  defaultValue={vaccine.type_disease}
                   register={register("type_disease", { required: true })}
                 />
               }
@@ -188,6 +195,7 @@ const CreateVaccinForm: React.FC<Props> = ({
               value={
                 <ModalInput
                   placeholder="side effect"
+                  defaultValue={vaccine.side_effect}
                   register={register("side_effect", { required: true })}
                 />
               }
@@ -198,6 +206,7 @@ const CreateVaccinForm: React.FC<Props> = ({
               value={
                 <ModalTextarea
                   placeholder="schedule"
+                  defaultValue={vaccine.vaccination_schedule}
                   register={register("vaccination_schedule", {
                     required: true,
                   })}
@@ -207,7 +216,11 @@ const CreateVaccinForm: React.FC<Props> = ({
             <RowField
               label="note"
               value={
-                <ModalTextarea placeholder="note" register={register("note")} />
+                <ModalTextarea
+                  placeholder="note"
+                  defaultValue={vaccine.note || ""}
+                  register={register("note")}
+                />
               }
             />
           </div>
@@ -217,4 +230,4 @@ const CreateVaccinForm: React.FC<Props> = ({
   );
 };
 
-export default CreateVaccinForm;
+export default EditVaccineForm;

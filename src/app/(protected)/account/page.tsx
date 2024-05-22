@@ -1,5 +1,5 @@
 "use client";
-import { Button, Loading, NoAvatar } from "@/components";
+import { Button, Loading, NoAvatar, VetRecords } from "@/components";
 import HeadTitle from "@/components/common/HeadTitle";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { userSelector } from "@/redux/selector";
@@ -19,7 +19,6 @@ import Rodal from "rodal";
 import "@/styles/cropper_custom_style.css";
 import { apiGetCurrent, apiUpdateCurrent } from "@/apis";
 import { getCurrent } from "@/redux/user/userSlice";
-import { ASSET_PATH } from "@/constants";
 
 interface InitState {
   visible: boolean;
@@ -200,7 +199,7 @@ const Account = () => {
   }
 
   return (
-    <div className="h-full rounded-xl overflow-hidden bg-lg-blue">
+    <div className="h-fit pb-5 rounded-xl bg-lg-blue">
       <Rodal visible={pageState.visible} onClose={handleCloseModal}>
         <div className="p-5 w-[500px]">
           <div className="font-semibold text-lg mb-3">
@@ -303,12 +302,15 @@ const Account = () => {
         My Profile
       </HeadTitle>
       <div className="flex m-5 relative">
-        <div className="shadow-lg bg-secondary rounded-xl p-2 h-fit">
+        <div className="shadow-lg bg-secondary rounded-xl p-2">
           <div className="w-[360px] px-5 pt-5 h-[340px]">
             {user.avatar ? (
-              <img className="rounded-full h-full w-full border-[1px]" src={user.avatar} />
+              <img
+                className="rounded-full h-full w-full border-[1px]"
+                src={user.avatar}
+              />
             ) : (
-              <NoAvatar name={user.fullName} style={{fontSize:60}}/>
+              <NoAvatar name={user.fullName} style={{ fontSize: 60 }} />
             )}
           </div>
           <p className="font-semibold text-90 text-2xl p-3 text-center">
@@ -359,6 +361,7 @@ const Account = () => {
           </div>
         </div>
       </div>
+      <VetRecords />
     </div>
   );
 };

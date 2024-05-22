@@ -15,14 +15,17 @@ interface Props {
 
 interface State {
   medicines: Medicine[];
+  name: string;
 }
+
+const initState = { medicines: [], name: "" };
 
 const MedicineChooseModal: React.FC<Props> = ({
   visible,
   onClose,
   appendMedicine,
 }) => {
-  const [state, setState] = useState<State>({ medicines: [] });
+  const [state, setState] = useState<State>(initState);
 
   useEffect(() => {
     const getMed = async () => {
@@ -31,6 +34,7 @@ const MedicineChooseModal: React.FC<Props> = ({
           const resData = await apiGetAllMedicine({
             limit: 5,
             page: 1,
+            name: state.name,
           });
           if (resData.success) {
             handleChange("medicines", resData.data);
@@ -39,7 +43,7 @@ const MedicineChooseModal: React.FC<Props> = ({
       }
     };
     getMed();
-  }, [visible]);
+  }, [visible, state.name]);
 
   const handleChange = (name: string, value: any) => {
     setState((prevState) => ({
@@ -49,46 +53,65 @@ const MedicineChooseModal: React.FC<Props> = ({
   };
 
   const handleMedicineSelect = (medicine: Medicine) => {
-    medicine.amount = 1;
     appendMedicine(medicine);
     onClose();
   };
 
+  const handleClose = () => {
+    onClose();
+    setState(initState);
+  };
+
   return (
-    <ModalForm visible={visible} onClose={onClose} title="Prescribe Medicine">
+    <ModalForm
+      visible={visible}
+      onClose={handleClose}
+      title="Prescribe Medicine"
+    >
       <div className="w-[1100px]">
         <div className="p-2 sticky top-0">
-          <ModalInput type="search" placeholder="Search for medicine" />
+          <ModalInput
+            type="search"
+            placeholder="Search for medicine"
+            value={state.name}
+            onchange={(e: any) => handleChange("name", e.target.value)}
+          />
         </div>
-        <table className="w-full">
-          <thead className="sticky top-[58px] bg-secondary shadow">
-            <tr>
-              <TableHeader>name</TableHeader>
-              <TableHeader>ingredient</TableHeader>
-              <TableHeader>intended use</TableHeader>
-              <TableHeader>indication</TableHeader>
-              <TableHeader>side effect</TableHeader>
-              <TableHeader>stock</TableHeader>
-            </tr>
-          </thead>
-          <tbody>
-            {state.medicines.map((medicine, i) => {
-              return (
-                <TableRow
-                  key={i}
-                  onClick={() => handleMedicineSelect(medicine)}
-                >
-                  <TableData>{medicine.name_medicine}</TableData>
-                  <TableData>{medicine.ingredient}</TableData>
-                  <TableData>{medicine.intended_use}</TableData>
-                  <TableData>{medicine.indication}</TableData>
-                  <TableData>{medicine.side_effect}</TableData>
-                  <TableData>{medicine.stock}</TableData>
-                </TableRow>
-              );
-            })}
-          </tbody>
-        </table>
+        {state.medicines.length > 0 ? (
+          <table className="w-full">
+            <thead className="sticky top-[58px] bg-secondary shadow">
+              <TableRow>
+                <TableHeader>name</TableHeader>
+                <TableHeader>ingredient</TableHeader>
+                <TableHeader>intended use</TableHeader>
+                <TableHeader>indication</TableHeader>
+                <TableHeader>side effect</TableHeader>
+                <TableHeader>stock</TableHeader>
+              </TableRow>
+            </thead>
+            <tbody>
+              {state.medicines.map((medicine, i) => {
+                return (
+                  <TableRow
+                    key={i}
+                    onClick={() => handleMedicineSelect(medicine)}
+                  >
+                    <TableData>{medicine.name_medicine}</TableData>
+                    <TableData>{medicine.ingredient}</TableData>
+                    <TableData>{medicine.intended_use}</TableData>
+                    <TableData>{medicine.indication}</TableData>
+                    <TableData>{medicine.side_effect}</TableData>
+                    <TableData>{medicine.stock}</TableData>
+                  </TableRow>
+                );
+              })}
+            </tbody>
+          </table>
+        ) : (
+          <div className="p-2 flex justify-center text-body">
+            Can not find anything
+          </div>
+        )}
       </div>
     </ModalForm>
   );

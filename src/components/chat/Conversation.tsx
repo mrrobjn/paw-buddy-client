@@ -1,4 +1,3 @@
-import { ASSET_PATH } from "@/constants";
 import { useAppSelector } from "@/redux/hook";
 import { socketSelector, userSelector } from "@/redux/selector";
 import moment from "moment";
@@ -34,7 +33,7 @@ export const Conversation: React.FC<Props> = ({
         )}
         {receiver?.profilePic ? (
           <img
-            src={receiver?.profilePic || ASSET_PATH.USER_AVT}
+            src={receiver?.profilePic}
             className="rounded-full w-full h-full"
           />
         ) : (
