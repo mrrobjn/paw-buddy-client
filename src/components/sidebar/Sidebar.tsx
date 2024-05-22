@@ -92,7 +92,7 @@ export const Sidebar = () => {
       <div>
         <div className="px-2 py-4 flex justify-center h-[80px]">
           <img
-            src={"assets/imgs/logo2.png"}
+            src={"/assets/imgs/logo2.png"}
             className="w-full transition-all"
             style={{ opacity: !isExpand ? 0 : 1 }}
           />

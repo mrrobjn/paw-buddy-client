@@ -1,14 +1,12 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { ToastContainer } from "react-toastify";
 import type { Metadata } from "next";
 import PageWrapper from "@/components/common/PageWrapper";
 import "@/styles/edit_modal_style.css";
 import "@/styles/pagination_custom_style.css";
 import "@/styles/animation.css";
 import "rodal/lib/rodal.css";
-import "react-big-calendar/lib/css/react-big-calendar.css";
-import 'react-toastify/dist/ReactToastify.css';
+
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,20 +24,7 @@ export default function RootLayout({
     <>
       <html lang="en">
         <body className={inter.className}>
-          <PageWrapper>
-            {children}
-            <ToastContainer
-              position="top-right"
-              autoClose={5000}
-              hideProgressBar={true}
-              newestOnTop={true}
-              closeOnClick
-              rtl={false}
-              draggable
-              pauseOnHover={false}
-              theme="light"
-            />
-          </PageWrapper>
+          <PageWrapper>{children}</PageWrapper>
         </body>
       </html>
     </>

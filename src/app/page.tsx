@@ -35,8 +35,8 @@ export default function Home() {
   });
 
   useEffect(() => {
-    onView(state.view);
-  }, []);
+    if (user._id) onView(state.view);
+  }, [user._id]);
 
   const handleChange = (name: string, value: any) => {
     setState((prevState) => ({
@@ -67,6 +67,7 @@ export default function Home() {
       if (resData.success) {
         const appoinments: Booking[] = resData.data;
         handleChange("data", appoinments);
+        return resData.data
       }
     } catch (error) {}
   };

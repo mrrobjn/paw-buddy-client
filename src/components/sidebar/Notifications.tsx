@@ -31,7 +31,7 @@ const Notifications = () => {
         const resData = await apiGetNotification();
         if (resData.success) {
           const data: Notify[] = resData.data;
-          handleChange("notifications", data.reverse());
+          handleChange("notifications", data);
 
           if (state.isExpand) {
             const res = await apiUpdateNotification();

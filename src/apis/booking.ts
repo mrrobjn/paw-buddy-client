@@ -23,7 +23,7 @@ export const apiGetBookingDetail = async (id: string | number) => {
 };
 
 export const apiApproveBooking = async (data: {
-  status: "pending" | "confirmed" | "finished" | "cancelled";
+  status: "pending" | "confirmed" | "completed" | "cancelled";
   booking_id: number;
 }) => {
   try {

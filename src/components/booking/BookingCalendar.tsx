@@ -1,4 +1,5 @@
 import moment from "moment";
+import { CSSProperties } from "react";
 import { Calendar, View, Event, momentLocalizer } from "react-big-calendar";
 
 const localizer = momentLocalizer(moment);
@@ -49,11 +50,31 @@ const BookingCalendar: React.FC<Props> = ({
 
       return {
         ...booking,
-        title: booking.date,
+        title: booking.status,
         start: startDateTime,
         end: endDateTime,
+        status: booking.status,
       };
     });
+  };
+
+  const eventStyleGetter = (
+    event: any,
+    start: any,
+    end: any,
+    isSelected: any
+  ) => {
+    const style: CSSProperties = {
+      backgroundColor:
+        event.status === "completed"
+          ? "#82C43C"
+          : event.status === "cancelled"
+          ? "#FC5A5A"
+          : event.status === "pending"
+          ? "#FFC542"
+          : "#247CFF",
+    };
+    return { style };
   };
 
   return (
@@ -70,6 +91,7 @@ const BookingCalendar: React.FC<Props> = ({
         views={["month", "week", "day"]}
         date={date}
         onSelectEvent={onSelectEvent}
+        eventPropGetter={eventStyleGetter}
       />
     </div>
   );
