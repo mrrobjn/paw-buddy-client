@@ -16,6 +16,7 @@ interface ModalInputProp {
   register?: UseFormRegisterReturn;
   value?: any;
   onchange?: ChangeEventHandler | any;
+  min?: string|number;
 }
 
 export const ModalInput: React.FC<ModalInputProp> = ({
@@ -28,6 +29,7 @@ export const ModalInput: React.FC<ModalInputProp> = ({
   defaultValue,
   value,
   onchange,
+  min,
 }) => {
   return (
     <input
@@ -43,6 +45,7 @@ export const ModalInput: React.FC<ModalInputProp> = ({
       value={value}
       onChange={onchange}
       step="any"
+      min={min}
       {...register}
     />
   );

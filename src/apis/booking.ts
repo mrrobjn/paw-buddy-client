@@ -42,3 +42,18 @@ export const apiCancelBooking = async (id: number) => {
     throw error;
   }
 };
+
+export const apiRecreateBooking = async (data: {
+  pet_id: number;
+  user_id: number;
+  date: string;
+  start_time: string;
+  booking_id: number;
+}) => {
+  try {
+    const res = await api.post("/booking/vet/", data);
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};

@@ -3,7 +3,13 @@ import moment from "moment";
 import ModalForm from "../form/ModalForm";
 import { ModalSelect } from "../form/ModalSelect";
 import { RowField } from "../form/RowField";
-import { FaMars, FaMinus, FaPlus, FaVenus, FaXmark } from "react-icons/fa6";
+import {
+  FaArrowRight,
+  FaMars,
+  FaPlus,
+  FaVenus,
+  FaXmark,
+} from "react-icons/fa6";
 import { Button } from "../common/Button";
 import { useEffect, useState } from "react";
 import MedicineChooseModal from "./MedicineChooseModal";
@@ -21,6 +27,9 @@ import { toast } from "react-toastify";
 import { useAppSelector } from "@/redux/hook";
 import { userSelector } from "@/redux/selector";
 import { NoAvatar } from "../common/NoAvatar";
+import Link from "next/link";
+import { FaQuestionCircle } from "react-icons/fa";
+import ReCreateBooking from "./ReCreateBooking";
 
 interface Props {
   visible: boolean;
@@ -35,6 +44,7 @@ interface State {
   medVisible: boolean;
   confirmVisible: boolean;
   warningVisible: boolean;
+  reExamVisible: boolean;
   recVisible: boolean;
   curMeds: Medicine[];
   totalPrice: number;
@@ -52,6 +62,7 @@ const initState: State = {
   confirmVisible: false,
   warningVisible: false,
   recVisible: false,
+  reExamVisible: false,
   isLoading: false,
   vaccines: [],
   vaccine_id: 0,
@@ -83,7 +94,7 @@ const BookingDetailModal: React.FC<Props> = ({
       );
       totalPrice +=
         state.curMeds &&
-        state.curMeds.reduce((sum, item) => sum + parseInt(item.price), 0);
+        state.curMeds.reduce((sum, item) => sum + parseFloat(item.price), 0);
       totalPrice +=
         state.vaccine_id &&
         parseFloat(
@@ -361,6 +372,23 @@ const BookingDetailModal: React.FC<Props> = ({
               </div>
             </div>
             {booking.status === "confirmed" && (
+              <div className="mb-2">
+                <RowField
+                  label=""
+                  value={
+                    <Button
+                      type="button"
+                      style={{ padding: "2px 8px" }}
+                      btnType="primary"
+                      onClick={() => handleChange("reExamVisible", true)}
+                    >
+                      Re-examination
+                    </Button>
+                  }
+                />
+              </div>
+            )}
+            {booking.status === "confirmed" && (
               <>
                 <RowField
                   label={"diagnosis"}
@@ -496,6 +524,16 @@ const BookingDetailModal: React.FC<Props> = ({
                 }
               />
             )}
+            {booking.status === "completed" && (
+              <div className="pt-2 flex justify-end">
+                <Link
+                  href={`/account/${booking.dataRecord?.id}`}
+                  className="flex items-center w-fit text-purple-700 hover:underline font-semibold"
+                >
+                  To record <FaArrowRight style={{ marginLeft: 8 }} />
+                </Link>
+              </div>
+            )}
           </div>
         )}
       </ModalForm>
@@ -516,6 +554,17 @@ const BookingDetailModal: React.FC<Props> = ({
         onClose={() => handleChange("recVisible", false)}
         id={booking.pet_id}
         petName={booking.dataPet.name_pet}
+      />
+      <ReCreateBooking
+        visible={state.reExamVisible}
+        onClose={() => handleChange("reExamVisible", false)}
+        booking_id={booking.id}
+        pet_id={booking.dataPet.id}
+        date={
+          new Date(new Date(booking.date).getTime() + 24 * 60 * 60 * 1000)
+            .toISOString()
+            .split("T")[0]
+        }
       />
     </>
   );
