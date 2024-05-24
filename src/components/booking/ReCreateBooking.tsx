@@ -4,8 +4,6 @@ import { ModalInput } from "../form/ModalInput";
 import { apiGetBooking, apiRecreateBooking } from "@/apis";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import { useAppSelector } from "@/redux/hook";
-import { userSelector } from "@/redux/selector";
 import { Loading } from "../loading/Loading";
 
 interface Props {
@@ -14,9 +12,11 @@ interface Props {
   pet_id: number;
   booking_id: number;
   date: string;
+  user_id: number;
+  fetchBooking:Function
 }
 
-const hours = [
+const HOURS = [
   ["07:00:00", "07:30:00", "08:00:00"],
   ["08:30:00", "09:00:00", "09:30:00"],
   ["10:00:00", "10:30:00", "11:00:00"],
@@ -49,9 +49,10 @@ const ReCreateBooking: React.FC<Props> = ({
   booking_id,
   pet_id,
   date,
+  user_id,
+  fetchBooking
 }) => {
   const [state, setState] = useState<State>(initState);
-  const user: User = useAppSelector(userSelector);
   const { handleSubmit } = useForm();
 
   useEffect(() => {
@@ -100,10 +101,11 @@ const ReCreateBooking: React.FC<Props> = ({
           date: state.date,
           pet_id,
           start_time: state.selTime,
-          user_id: user.id,
+          user_id: user_id,
         });
         if (resData.success) {
           toast.success("Create booking successfullly");
+          await fetchBooking()
           handleClose();
         } else {
           handleChange("error", resData.message);
@@ -139,7 +141,7 @@ const ReCreateBooking: React.FC<Props> = ({
             />
           </div>
           <div className="flex px-1">
-            {hours.map((hs, i) => {
+            {HOURS.map((hs, i) => {
               return (
                 <div key={i}>
                   <div className="p-1">
