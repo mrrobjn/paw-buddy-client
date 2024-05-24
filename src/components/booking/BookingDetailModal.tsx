@@ -28,7 +28,6 @@ import { useAppSelector } from "@/redux/hook";
 import { userSelector } from "@/redux/selector";
 import { NoAvatar } from "../common/NoAvatar";
 import Link from "next/link";
-import { FaQuestionCircle } from "react-icons/fa";
 import ReCreateBooking from "./ReCreateBooking";
 
 interface Props {
@@ -560,6 +559,8 @@ const BookingDetailModal: React.FC<Props> = ({
         onClose={() => handleChange("reExamVisible", false)}
         booking_id={booking.id}
         pet_id={booking.dataPet.id}
+        user_id={booking.dataUser.id}
+        fetchBooking={fetchBooking}
         date={
           new Date(new Date(booking.date).getTime() + 24 * 60 * 60 * 1000)
             .toISOString()
