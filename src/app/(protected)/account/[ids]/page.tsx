@@ -144,7 +144,7 @@ const PetRecord = () => {
                     </View>
                   </View>
                   <View style={styles.section}>
-                    <Text>Owner's Information</Text>
+                    <Text>Owner&apos;s Information</Text>
                   </View>
                   <View>
                     <View style={styles.row}>
@@ -167,7 +167,7 @@ const PetRecord = () => {
                     </View>
                   </View>
                   <View style={styles.section}>
-                    <Text>Vetenarian's Information</Text>
+                    <Text>Vetenarian&apos;s Information</Text>
                   </View>
                   <View>
                     <View style={styles.row}>
