@@ -263,6 +263,8 @@ interface PetRecord {
     medicineData: Medicine;
   }[];
   vaccineData: Vaccine;
+  vetData: UserData;
+  petData: Pet;
 }
 
 interface Pet {
@@ -280,11 +282,12 @@ interface Pet {
   is_neutered: false;
   createdAt: string;
   updatedAt: string;
-  speciesData: null;
-  userData: {
-    id: number;
-    fullName: string;
-    email: string;
-    phone: string | null;
-  };
+  userData: UserData;
+}
+
+interface UserData {
+  id: number;
+  fullName: string;
+  email: string;
+  phone: string | null;
 }

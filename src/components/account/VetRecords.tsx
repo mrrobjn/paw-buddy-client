@@ -6,7 +6,6 @@ import { apiGetVetRecord } from "@/apis";
 import TableData from "../table/TableData";
 import moment from "moment";
 import { useRouter } from "next/navigation";
-import HeadTitle from "../common/HeadTitle";
 
 const tableHeaders = [
   "Exam Date",
@@ -35,7 +34,6 @@ export const VetRecords = () => {
 
   return (
     <div className="mx-5 rounded-xl bg-secondary shadow-lg">
-      <HeadTitle>My records history</HeadTitle>
       <table className="w-full">
         <thead>
           <TableRow>
@@ -48,7 +46,7 @@ export const VetRecords = () => {
           {records.map((rec, i) => (
             <TableRow
               key={i}
-              onClick={() => router.push(`/account/${rec.pet_id}`)}
+              onClick={() => router.push(`/account/${rec.pet_id},${rec.id}`)}
             >
               <TableData>
                 <div>
