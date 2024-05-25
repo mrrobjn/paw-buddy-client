@@ -182,7 +182,7 @@ export const Sidebar = () => {
               }}
             >
               {user.avatar ? (
-                <img className="rounded-full" src={user.avatar} />
+                <img className="rounded-full h-full w-full" src={user.avatar} />
               ) : (
                 <NoAvatar name={user.fullName} />
               )}

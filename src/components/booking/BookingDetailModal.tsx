@@ -370,24 +370,24 @@ const BookingDetailModal: React.FC<Props> = ({
                 />
               </div>
             </div>
-            {booking.status === "confirmed" ||
-              (booking.status === "completed" && (
-                <div className="mb-2">
-                  <RowField
-                    label=""
-                    value={
-                      <Button
-                        type="button"
-                        style={{ padding: "2px 8px" }}
-                        btnType="primary"
-                        onClick={() => handleChange("reExamVisible", true)}
-                      >
-                        Re-examination
-                      </Button>
-                    }
-                  />
-                </div>
-              ))}
+            {(booking.status === "confirmed" ||
+              booking.status === "completed") && (
+              <div className="mb-2">
+                <RowField
+                  label=""
+                  value={
+                    <Button
+                      type="button"
+                      style={{ padding: "2px 8px" }}
+                      btnType="primary"
+                      onClick={() => handleChange("reExamVisible", true)}
+                    >
+                      Re-examination
+                    </Button>
+                  }
+                />
+              </div>
+            )}
             {booking.status === "confirmed" && (
               <>
                 <RowField
