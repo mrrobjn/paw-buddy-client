@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@bitnoi.se/react-scheduler": "^0.1.5",
+    "@react-pdf/renderer": "^3.4.4",
     "@reduxjs/toolkit": "^2.2.3",
     "axios": "^1.6.8",
     "file-loader": "^6.2.0",

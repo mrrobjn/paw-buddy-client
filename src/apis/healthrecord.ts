@@ -1,8 +1,13 @@
 import api from "@/config/axios";
 
-export const apiGetRecord = async (id: number) => {
+export const apiGetRecord = async (
+  id: number,
+  params?: { limit: number; page: number; id?: number }
+) => {
   try {
-    const res = await api.get(`/medicalRecord/get-record-of-pet/${id}`);
+    const res = await api.get(`/medicalRecord/get-record-of-pet/${id}`, {
+      params,
+    });
     return res.data;
   } catch (error) {
     throw error;

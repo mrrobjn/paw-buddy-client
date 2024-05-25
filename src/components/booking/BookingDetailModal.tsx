@@ -370,23 +370,24 @@ const BookingDetailModal: React.FC<Props> = ({
                 />
               </div>
             </div>
-            {booking.status === "confirmed" && (
-              <div className="mb-2">
-                <RowField
-                  label=""
-                  value={
-                    <Button
-                      type="button"
-                      style={{ padding: "2px 8px" }}
-                      btnType="primary"
-                      onClick={() => handleChange("reExamVisible", true)}
-                    >
-                      Re-examination
-                    </Button>
-                  }
-                />
-              </div>
-            )}
+            {booking.status === "confirmed" ||
+              (booking.status === "completed" && (
+                <div className="mb-2">
+                  <RowField
+                    label=""
+                    value={
+                      <Button
+                        type="button"
+                        style={{ padding: "2px 8px" }}
+                        btnType="primary"
+                        onClick={() => handleChange("reExamVisible", true)}
+                      >
+                        Re-examination
+                      </Button>
+                    }
+                  />
+                </div>
+              ))}
             {booking.status === "confirmed" && (
               <>
                 <RowField
@@ -526,7 +527,7 @@ const BookingDetailModal: React.FC<Props> = ({
             {booking.status === "completed" && (
               <div className="pt-2 flex justify-end">
                 <Link
-                  href={`/account/${booking.dataRecord?.id}`}
+                  href={`/account/${booking.dataPet.id},${booking.dataRecord?.id}`}
                   className="flex items-center w-fit text-purple-700 hover:underline font-semibold"
                 >
                   To record <FaArrowRight style={{ marginLeft: 8 }} />
